@@ -1,9 +1,43 @@
 import { expect, it, describe } from "vitest";
 import { Equal, Expect } from "../helpers/type-utils";
 
-export const getHomePageFeatureFlags = (
-  config: unknown,
-  override: (flags: unknown) => unknown
+export const getHomePageFeatureFlags2 = <
+  T extends {
+    rawConfig: {
+      featureFlags: {
+        homePage: {
+          showBanner: boolean;
+          showLogOut: boolean;
+        };
+      };
+    };
+  }
+>(
+  config: T,
+  override: <U extends T["rawConfig"][`featureFlags`]["homePage"]>(
+    // This solution is potentially wrong: the U that the function
+    // is taking as a parameter will most likely be different
+    // after "override" is applied, so you should return
+    // T["rawConfig"][`featureFlags`]["homePage"]
+    // This is working just because you defined both the
+    // `showBanner` and `showLogout` types, but actually you should
+    // not know the types inside the `homePage` feature flags.
+    flags: U
+  ) => U
+) => {
+  return override(config.rawConfig.featureFlags.homePage);
+};
+
+// Here's a better solution to avoid the drilling
+export const getHomePageFeatureFlags = <HomePageFlags>(
+  config: {
+    rawConfig: {
+      featureFlags: {
+        homePage: HomePageFlags; // We use the generic here to make typescript infer it
+      };
+    };
+  },
+  override: (flags: HomePageFlags) => HomePageFlags // We reuse it later here
 ) => {
   return override(config.rawConfig.featureFlags.homePage);
 };

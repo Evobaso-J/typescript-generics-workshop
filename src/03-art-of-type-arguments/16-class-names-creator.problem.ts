@@ -2,8 +2,8 @@ import { expect, it } from "vitest";
 import { Equal, Expect } from "../helpers/type-utils";
 
 const createClassNamesFactory =
-  (classes: unknown) =>
-  (type: unknown, ...otherClasses: unknown[]) => {
+  <ClassKey extends string>(classes: Record<ClassKey, string>) =>
+  (type: ClassKey, ...otherClasses: unknown[]) => {
     const classList = [classes[type], ...otherClasses];
     return classList.join(" ");
   };
